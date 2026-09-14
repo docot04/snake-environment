@@ -213,14 +213,26 @@ void snake_get_state(const Snake *game, int state[STATE_SIZE]) {
 
 void print_state(const Snake *game)
 {
+    if (game == NULL)
+        return;
+
     printf("Length: %d\n", game->length);
-    printf("Score: %d\n", game->score);
+    printf("Head: (%d, %d)\n", game->snake[0].x, game->snake[0].y);
+    printf("Food: (%d, %d)\n", game->food.x, game->food.y);
 
-    printf("Head: (%d, %d)\n",
-           game->snake[0].x,
-           game->snake[0].y);
+    for (int y = 0; y < GRID_HEIGHT; y++)
+    {
+        for (int x = 0; x < GRID_WIDTH; x++)
+        {
+            Position pos = {x, y};
+            if (position_equal(pos, game->food))
+                printf("X ");
+            else if (snake_contains_position(game, pos))
+                printf("O ");
+            else
+                printf(". ");
+        }
 
-    printf("Food: (%d, %d)\n",
-           game->food.x,
-           game->food.y);
+        printf("\n");
+    }
 }
