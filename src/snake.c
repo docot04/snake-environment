@@ -126,10 +126,16 @@ void snake_seed(unsigned int seed) {
 }
 
 void snake_reset(Snake *game) {
-    game->length = 1;
+    if (game==NULL)
+        return;
+    game->length = 2;
     game->score = 0;
     game->done = false;
     spawn_food(game);
+    int start_x = GRID_WIDTH / 2;
+    int start_y = GRID_HEIGHT / 2;
+    game->snake[0.x,0.y] = (Position){start_x, start_y};
+    game->snake[1.x,1.y] = (Position){start_x - 1, start_y};
 }
 
 // snake_step
