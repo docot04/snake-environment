@@ -1,7 +1,10 @@
 #ifndef SNAKE_H
 #define SNAKE_H
 
-#include <stdbool.h>
+#include<stdbool.h> 
+#include<stdio.h>
+#include<stdlib.h>
+#include<time.h>
 
 #define GRID_WIDTH 20
 #define GRID_HEIGHT 20
@@ -49,7 +52,7 @@ typedef struct {
  * 10. direction_left
  * 11. direction_right
  */
-int state[11];
+#define STATE_SIZE 11;
 
 /**
  * ACTION: create or reset the game state
@@ -69,13 +72,13 @@ float snake_step(Snake *game, Action action);
  * PARAMS: Snake
  * RETURN: boolean
  */
-int snake_is_done(Snake *game);
+bool snake_is_done(Snake *game);
 
 /**
  * ACTION: get current game state
  * PARAMS: Snake, state
  */
-void snake_get_state(Snake *game, int state[11]);
+void snake_get_state(Snake *game, int state[STATE_SIZE]);
 
 /**
  * ACTION: print current environment
