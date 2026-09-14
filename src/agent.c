@@ -7,7 +7,6 @@
 // while(!is_done(&game)){
 //     get_state(&game, state);
 //     action = agent_choose_action(state);
-//     step(&game, action);
-//     reward = get_reward(&game);
-//     agent_learn(state, action, reward);
+//     consequence = step(&game, action);
+//     agent_learn(state, action, consequence);
 // }
