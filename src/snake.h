@@ -52,7 +52,7 @@ typedef struct {
  * 10. direction_left
  * 11. direction_right
  */
-#define STATE_SIZE 11;
+#define STATE_SIZE 11
 
 /**
  * ACTION: create or reset the game state
@@ -72,7 +72,7 @@ float snake_step(Snake *game, Action action);
  * PARAMS: Snake
  * RETURN: boolean
  */
-bool snake_is_done(Snake *game);
+bool snake_is_done(const Snake *game);
 
 /**
  * ACTION: get current game state
