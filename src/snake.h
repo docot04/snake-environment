@@ -55,6 +55,12 @@ typedef struct {
 #define STATE_SIZE 11
 
 /**
+ * ACTION: creates a random seed for rand()
+ * PARAMS: unsigned int
+ */
+void snake_seed(unsigned int seed);
+
+/**
  * ACTION: create or reset the game state
  * PARAMS: Snake
  */
@@ -78,12 +84,12 @@ bool snake_is_done(const Snake *game);
  * ACTION: get current game state
  * PARAMS: Snake, state
  */
-void snake_get_state(Snake *game, int state[STATE_SIZE]);
+void snake_get_state(const Snake *game, int state[STATE_SIZE]);
 
 /**
  * ACTION: print current environment
  * PARAMS: Snake
  */
-void print_state(Snake *game);
+void print_state(const Snake *game);
 
 #endif
