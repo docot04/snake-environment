@@ -119,10 +119,56 @@ static bool collision_with_snake(const Snake *game, Position pos, bool ignore_ta
     return false;
 }
 
+// MAIN PUBLIC APIS
+
+void snake_seed(unsigned int seed) {
+    srand(seed);
+}
+
 // snake reset
 // snake step
 
-bool snake_is_done(const Snake *game){
+bool snake_is_done(const Snake *game) {
     if(game== NULL || game->done) return true;
 }
 
+void snake_get_state(const Snake *game, int state[STATE_SIZE]) {
+    if (game == NULL || state == NULL) return;
+    Position head = game->snake[0];
+
+    // determine the directions corresponding to the actions
+    Direction straight = game->direction;
+    Direction left = get_new_direction(game->direction, ACTION_LEFT);
+    Direction right = get_new_direction(game->direction,ACTION_RIGHT);
+
+    Position danger_straight = get_next_position(game, straight);
+    Position danger_left = get_next_position(game, left);
+    Position danger_right = get_next_position(game, right);
+
+    // danger_right
+    state[0] =
+        !position_is_inside_grid(danger_straight) ||
+        collision_with_snake(game, danger_straight, true);
+
+    // danger_left
+    state[1] =
+        !position_is_inside_grid(danger_left) ||
+        collision_with_snake(game, danger_left, true);
+
+    // danger_right
+    state[2] =
+        !position_is_inside_grid(danger_right) ||
+        collision_with_snake(game, danger_right, true);
+
+    // food directions (relative to  global grid)
+    state[3] = game->food.y < head.y;  // food_up
+    state[4] = game->food.y > head.y;  // food_down
+    state[5] = game->food.x < head.x;  // food_left
+    state[6] = game->food.x > head.x;  // food_right
+
+    // current direction
+    state[7] = game->direction == DIRECTION_UP;
+    state[8] = game->direction == DIRECTION_DOWN;
+    state[9] = game->direction == DIRECTION_LEFT;
+    state[10] = game->direction == DIRECTION_RIGHT;
+}
