@@ -129,16 +129,42 @@ void snake_reset(Snake *game) {
     if (game==NULL)
         return;
     game->length = 2;
+    int start_x = GRID_WIDTH / 2;
+    int start_y = GRID_HEIGHT / 2;
+    game->direction = DIRECTION_RIGHT;
+    game->snake[0].x = start_x;
+    game->snake[0].y = start_y;
+    game->snake[1].x = start_x-1;
+    game->snake[1].y = start_y;
     game->score = 0;
     game->done = false;
     spawn_food(game);
-    int start_x = GRID_WIDTH / 2;
-    int start_y = GRID_HEIGHT / 2;
-    game->snake[0.x,0.y] = (Position){start_x, start_y};
-    game->snake[1.x,1.y] = (Position){start_x - 1, start_y};
 }
 
-// snake_step
+float snake_step(Snake *game, Action action) {
+    if (game==NULL || game->done)
+        return 0.0f;
+
+    Direction new_direction=get_new_direction(game->direction, action);
+    Position new_head=get_next_position(game, new_direction);
+    if (!position_is_inside_grid(new_head) || collision_with_snake(game, new_head, true)) {
+        game->done=true;
+        return -10.0f;
+    }
+    for (int i=game->length; i > 0; i--) {
+        game->snake[i] = game->snake[i-1];
+    }
+    game->snake[0]=new_head;
+    game->direction=new_direction;
+    if (position_equal(new_head, game->food)) {
+        game->length++;
+        game->score++;
+        spawn_food(game);
+        return 5.0f;
+    }
+
+    return 0.1f;
+}
 
 bool snake_is_done(const Snake *game) {
     if(game== NULL || game->done) return true;
@@ -185,4 +211,13 @@ void snake_get_state(const Snake *game, int state[STATE_SIZE]) {
     state[10] = game->direction == DIRECTION_RIGHT;
 }
 
-// print_state
+void print_state(const int state[STATE_SIZE]) {
+    printf("State: [");
+    for (int i = 0; i < STATE_SIZE; i++) {
+        printf("%d", state[i]);
+        if (i < STATE_SIZE - 1) {
+            printf("\n");
+        }
+    }
+    printf("]\n");
+}
