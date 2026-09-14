@@ -125,7 +125,13 @@ void snake_seed(unsigned int seed) {
     srand(seed);
 }
 
-// snake_reset
+void snake_reset(Snake *game) {
+    game->length = 1;
+    game->score = 0;
+    game->done = false;
+    spawn_food(game);
+}
+
 // snake_step
 
 bool snake_is_done(const Snake *game) {
