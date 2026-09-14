@@ -9,6 +9,9 @@
 #define GRID_WIDTH 20
 #define GRID_HEIGHT 20
 #define MAX_SNAKE_LENGTH (GRID_HEIGHT * GRID_WIDTH)
+#define WEIGHT_PUNISHMENT -10.0f
+#define WEIGHT_FOOD 5.0f
+#define WEIGHT_SURVIVAL -0.01f
 
 typedef enum {
     ACTION_STRAIGHT = 0,

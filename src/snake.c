@@ -8,8 +8,7 @@
  * RETURN: bool
  */
 static bool position_equal(Position pos1, Position pos2) {
-    bool result = (pos1.x==pos2.y && pos1.y==pos2.y);
-    return result;
+    return (pos1.x == pos2.x && pos1.y == pos2.y);
 }
 
 /**
@@ -126,48 +125,83 @@ void snake_seed(unsigned int seed) {
 }
 
 void snake_reset(Snake *game) {
-    if (game==NULL)
-        return;
+    if (game==NULL) return;
+
+    // initial snake lenght
     game->length = 2;
+
+    // initial snake starting point
     int start_x = GRID_WIDTH / 2;
     int start_y = GRID_HEIGHT / 2;
+
+    // initial snake movement direction
     game->direction = DIRECTION_RIGHT;
+
+    // initial snake position
     game->snake[0].x = start_x;
     game->snake[0].y = start_y;
     game->snake[1].x = start_x-1;
     game->snake[1].y = start_y;
+
+    // initial score
     game->score = 0;
     game->done = false;
+
+    // start the loop
     spawn_food(game);
 }
 
 float snake_step(Snake *game, Action action) {
-    if (game==NULL || game->done)
-        return 0.0f;
-
+    if (game==NULL || game->done) return 0.0f;
+    
+    // check valid actions
+    if (action<ACTION_STRAIGHT || action>ACTION_RIGHT) return 0.0f;
+    
+    // get new direction
     Direction new_direction=get_new_direction(game->direction, action);
-    Position new_head=get_next_position(game, new_direction);
-    if (!position_is_inside_grid(new_head) || collision_with_snake(game, new_head, true)) {
-        game->done=true;
-        return -10.0f;
-    }
-    for (int i=game->length; i > 0; i--) {
-        game->snake[i] = game->snake[i-1];
-    }
-    game->snake[0]=new_head;
     game->direction=new_direction;
-    if (position_equal(new_head, game->food)) {
-        game->length++;
+
+    // get new head position
+    Position new_head=get_next_position(game, game->direction);
+
+    // check if out of grid
+    if (!position_is_inside_grid(new_head)) {
+        game->done=true;
+        return WEIGHT_PUNISHMENT;
+    }
+
+    // check if food eaten
+    bool food_eaten=position_equal(new_head, game->food);
+
+    // check if collision with self
+    if (collision_with_snake(game, new_head, !food_eaten)) {
+        game->done=true;
+        return WEIGHT_PUNISHMENT;
+    }
+
+    // increase if food eaten
+    if (food_eaten){
+        if(game->length<MAX_SNAKE_LENGTH) game->length++;
+    }
+
+    // update snake position
+    for (int i=game->length-1; i > 0; i--) game->snake[i] = game->snake[i-1];
+    
+    game->snake[0]=new_head;
+
+    // increase score
+    if (food_eaten) {
         game->score++;
         spawn_food(game);
-        return 5.0f;
+        return WEIGHT_FOOD;
     }
 
-    return 0.1f;
+    return WEIGHT_SURVIVAL;
 }
 
 bool snake_is_done(const Snake *game) {
-    if(game== NULL || game->done) return true;
+    if (game == NULL) return true;
+    return game->done;
 }
 
 void snake_get_state(const Snake *game, int state[STATE_SIZE]) {
@@ -216,23 +250,32 @@ void print_state(const Snake *game)
     if (game == NULL)
         return;
 
-    printf("Length: %d\n", game->length);
-    printf("Head: (%d, %d)\n", game->snake[0].x, game->snake[0].y);
+    printf("Length: %d ", game->length);
+    printf("Head: (%d, %d) ", game->snake[0].x, game->snake[0].y);
     printf("Food: (%d, %d)\n", game->food.x, game->food.y);
 
-    for (int y = 0; y < GRID_HEIGHT; y++)
-    {
-        for (int x = 0; x < GRID_WIDTH; x++)
-        {
-            Position pos = {x, y};
-            if (position_equal(pos, game->food))
-                printf("X ");
-            else if (snake_contains_position(game, pos))
-                printf("O ");
-            else
-                printf(". ");
-        }
-
+    for (int y = 0; y < GRID_HEIGHT; y++) {
+        for (int x = 0; x < GRID_WIDTH; x++) {
+            Position pos = {.x=x, .y=y};
+            bool flag=false;
+            for (int i=0;i<game->length;i++) {
+                if (position_equal(pos,game->snake[i])) {
+                    if (i==0)
+                        printf("O ");
+                    else
+                        printf("o ");
+                    flag=true;
+                    break;                    
+                }                  
+            }
+            if (flag)
+                continue;   
+            if (position_equal(pos,game->food)) {
+                printf("* ");
+                continue;
+            } 
+            printf(". ");        
+        } 
         printf("\n");
     }
 }
