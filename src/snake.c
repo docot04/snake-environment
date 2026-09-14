@@ -211,13 +211,16 @@ void snake_get_state(const Snake *game, int state[STATE_SIZE]) {
     state[10] = game->direction == DIRECTION_RIGHT;
 }
 
-void print_state(const int state[STATE_SIZE]) {
-    printf("State: [");
-    for (int i = 0; i < STATE_SIZE; i++) {
-        printf("%d", state[i]);
-        if (i < STATE_SIZE - 1) {
-            printf("\n");
-        }
-    }
-    printf("]\n");
+void print_state(const Snake *game)
+{
+    printf("Length: %d\n", game->length);
+    printf("Score: %d\n", game->score);
+
+    printf("Head: (%d, %d)\n",
+           game->snake[0].x,
+           game->snake[0].y);
+
+    printf("Food: (%d, %d)\n",
+           game->food.x,
+           game->food.y);
 }
