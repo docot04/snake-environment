@@ -5,6 +5,8 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<time.h>
+#include <sys/select.h>
+#include <unistd.h>
 #include<SDL2/SDL.h>
 
 #define GRID_WIDTH 20
