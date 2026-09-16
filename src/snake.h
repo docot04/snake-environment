@@ -6,12 +6,17 @@
 #include<stdlib.h>
 #include<time.h>
 
+#include<SDL2/SDL.h>
+#include<SDL2/SDL_image.h>
+#include<SDL2/SDL_ttf.h>
+
 #define GRID_WIDTH 20
 #define GRID_HEIGHT 20
 #define MAX_SNAKE_LENGTH (GRID_HEIGHT * GRID_WIDTH)
 #define WEIGHT_PUNISHMENT -10.0f
 #define WEIGHT_FOOD 5.0f
 #define WEIGHT_SURVIVAL -0.01f
+#define CELL_SIZE 20
 
 typedef enum {
     ACTION_STRAIGHT = 0,

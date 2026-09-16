@@ -279,3 +279,30 @@ void print_state(const Snake *game)
         printf("\n");
     }
 }
+
+void render_state(SDL_Renderer *renderer, const Snake *game){
+    if (game==NULL)
+        return;
+    SDL_SetRenderDrawColor(renderer,20,20,20,225);
+    SDL_RenderClear(renderer);
+    for (int i=0;i<game->length;i++){
+        SDL_Rect segment;
+        segment.x=game->snake[i].x * CELL_SIZE;
+        segment.y=game->snake[i].y * CELL_SIZE;
+        segment.w=CELL_SIZE;
+        segment.h=CELL_SIZE;
+        if (i==0)
+            SDL_SetRenderDrawColor(renderer,0,255,0,255);
+        else
+            SDL_SetRenderDrawColor(renderer,0,180,0,255);      
+        SDL_RenderFillRect(renderer,&segment);
+    } 
+    SDL_Rect food;
+    food.x=game->food.x * CELL_SIZE;
+    food.y=game->food.y * CELL_SIZE;
+    food.w=CELL_SIZE;
+    food.h=CELL_SIZE;
+    SDL_SetRenderDrawColor(renderer,255,0,0,255);
+    SDL_RenderFillRect(renderer,&food);
+    SDL_RenderPresent(renderer);    
+}
