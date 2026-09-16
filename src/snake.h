@@ -5,10 +5,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<time.h>
-
 #include<SDL2/SDL.h>
-#include<SDL2/SDL_image.h>
-#include<SDL2/SDL_ttf.h>
 
 #define GRID_WIDTH 20
 #define GRID_HEIGHT 20
@@ -90,14 +87,14 @@ bool snake_is_done(const Snake *game);
 
 /**
  * ACTION: get current game state
- * PARAMS: Snake, state
+ * PARAMS: Snake, state[]
  */
 void snake_get_state(const Snake *game, int state[STATE_SIZE]);
 
 /**
- * ACTION: print current environment
- * PARAMS: Snake
+ * ACTION: render the current game state
+ * PARAMS: SDL_Renderer, Snake
  */
-void print_state(const Snake *game);
+void render_state(SDL_Renderer *renderer, const Snake *game);
 
 #endif

@@ -16,7 +16,7 @@ static bool position_equal(Position pos1, Position pos2) {
  * PARAMS: Position
  * RETURN: bool
  */
-static bool position_is_inside_grid(Position pos){
+static bool position_is_inside_grid(Position pos) {
     bool result = (pos.x>=0 && pos.x<GRID_WIDTH && pos.y>=0 && pos.y<GRID_HEIGHT);
     return result;
 }
@@ -26,7 +26,7 @@ static bool position_is_inside_grid(Position pos){
  * PARAMS: Snake, Position
  * RETURN: bool
  */
-static bool snake_contains_position(const Snake *game, Position pos){
+static bool snake_contains_position(const Snake *game, Position pos) {
     for (int i = 0; i < game->length; i++) {
         if (position_equal(game->snake[i], pos)) return true;
     }
@@ -38,16 +38,14 @@ static bool snake_contains_position(const Snake *game, Position pos){
  * PARAMS: Snake, Direction
  * RETURN: Position
  */
-static Position get_next_position(const Snake *game, Direction direction){
+static Position get_next_position(const Snake *game, Direction direction) {
     Position head = game->snake[0];
-
     switch (direction) {
         case DIRECTION_UP: head.y--; break;
         case DIRECTION_DOWN: head.y++; break;
         case DIRECTION_LEFT: head.x--; break;
         case DIRECTION_RIGHT: head.x++; break;
     }
-
     return head;
 }
 
@@ -56,7 +54,7 @@ static Position get_next_position(const Snake *game, Direction direction){
  * PARAMS: Direction, Action
  * RETURN: Direction
  */
-static Direction get_new_direction(Direction current_dir, Action action){
+static Direction get_new_direction(Direction current_dir, Action action) {
     if (action == ACTION_STRAIGHT) {
         return current_dir;
     }
@@ -245,64 +243,34 @@ void snake_get_state(const Snake *game, int state[STATE_SIZE]) {
     state[10] = game->direction == DIRECTION_RIGHT;
 }
 
-void print_state(const Snake *game)
-{
-    if (game == NULL)
-        return;
+void render_state(SDL_Renderer *renderer, const Snake *game) {
+    if (renderer == NULL || game == NULL) return;
 
-    printf("Length: %d ", game->length);
-    printf("Head: (%d, %d) ", game->snake[0].x, game->snake[0].y);
-    printf("Food: (%d, %d)\n", game->food.x, game->food.y);
-
-    for (int y = 0; y < GRID_HEIGHT; y++) {
-        for (int x = 0; x < GRID_WIDTH; x++) {
-            Position pos = {.x=x, .y=y};
-            bool flag=false;
-            for (int i=0;i<game->length;i++) {
-                if (position_equal(pos,game->snake[i])) {
-                    if (i==0)
-                        printf("O ");
-                    else
-                        printf("o ");
-                    flag=true;
-                    break;                    
-                }                  
-            }
-            if (flag)
-                continue;   
-            if (position_equal(pos,game->food)) {
-                printf("* ");
-                continue;
-            } 
-            printf(". ");        
-        } 
-        printf("\n");
-    }
-}
-
-void render_state(SDL_Renderer *renderer, const Snake *game){
-    if (game==NULL)
-        return;
-    SDL_SetRenderDrawColor(renderer,20,20,20,225);
+    // background
+    SDL_SetRenderDrawColor(renderer, 20, 20, 20, 255);
     SDL_RenderClear(renderer);
-    for (int i=0;i<game->length;i++){
+
+    // draw snake
+    for (int i = 0; i < game->length; i++) {
         SDL_Rect segment;
-        segment.x=game->snake[i].x * CELL_SIZE;
-        segment.y=game->snake[i].y * CELL_SIZE;
-        segment.w=CELL_SIZE;
-        segment.h=CELL_SIZE;
-        if (i==0)
-            SDL_SetRenderDrawColor(renderer,0,255,0,255);
-        else
-            SDL_SetRenderDrawColor(renderer,0,180,0,255);      
-        SDL_RenderFillRect(renderer,&segment);
-    } 
+        segment.x = game->snake[i].x * CELL_SIZE;
+        segment.y = game->snake[i].y * CELL_SIZE;
+        segment.w = CELL_SIZE;
+        segment.h = CELL_SIZE;
+        if (i == 0) SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255); // snake head
+        else SDL_SetRenderDrawColor(renderer, 0, 180, 0, 255);        // snake body
+        SDL_RenderFillRect(renderer, &segment);
+    }
+
+    // draw food
     SDL_Rect food;
-    food.x=game->food.x * CELL_SIZE;
-    food.y=game->food.y * CELL_SIZE;
-    food.w=CELL_SIZE;
-    food.h=CELL_SIZE;
-    SDL_SetRenderDrawColor(renderer,255,0,0,255);
-    SDL_RenderFillRect(renderer,&food);
-    SDL_RenderPresent(renderer);    
+    food.x = game->food.x * CELL_SIZE;
+    food.y = game->food.y * CELL_SIZE;
+    food.w = CELL_SIZE;
+    food.h = CELL_SIZE;
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    SDL_RenderFillRect(renderer, &food);
+
+    // display frame
+    SDL_RenderPresent(renderer);
 }

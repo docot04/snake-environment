@@ -1,49 +1,86 @@
 #include "snake.h"
-#include <stdio.h>
 
-Action get_action(void) {
-    char input;
-    while (1) {
-        printf("\nAction [A = left, S = straight, D = right]: ");
-        scanf(" %c", &input);
-        switch (input) {
-            case 'a':
-            case 'A': return ACTION_LEFT;
-            case 's':
-            case 'S': return ACTION_STRAIGHT;
-            case 'd':
-            case 'D': return ACTION_RIGHT;
-            default: printf("Invalid input\n");
-        }
-    }
-}
+int main(void) {
 
-void print_observation(const int state[STATE_SIZE]) {
-    printf("\nState: [");
-    for (int i = 0; i < STATE_SIZE; i++) {
-        printf("%d", state[i]);
-        if (i < STATE_SIZE - 1) printf(", ");
-    }
-    printf("]\n");
-}
-
-
-int main() {
-    snake_seed(42);
+    // initialize game
     Snake game;
+    snake_seed(time(NULL));
     snake_reset(&game);
-    printf("<SNAKE GAME>\n");
-    while (!snake_is_done(&game)) {
-        int state[STATE_SIZE];
-        snake_get_state(&game, state);
-        print_state(&game);
-        print_observation(state);
-        Action action = get_action();
-        float reward = snake_step(&game, action);
-        printf("Reward: %.1f\n", reward);
+
+    // initialize sdl2
+    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+        printf("SDL_Init failed: %s\n", SDL_GetError());
+        return 1;
     }
-    print_state(&game);
-    printf("GAME OVER\n");
-    printf("Final score: %d\n", game.score);
+    SDL_Window *window = SDL_CreateWindow(
+        "Snake Game",
+        SDL_WINDOWPOS_CENTERED,
+        SDL_WINDOWPOS_CENTERED,
+        GRID_WIDTH * CELL_SIZE,
+        GRID_HEIGHT * CELL_SIZE,
+        SDL_WINDOW_SHOWN
+    );
+    if (window == NULL) {
+        printf("Window creation failed: %s\n",SDL_GetError());
+        SDL_Quit();
+        return 1;
+    }
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    if (renderer == NULL) {
+        printf("Renderer creation failed: %s\n", SDL_GetError());
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return 1;
+    }
+
+    // game loop
+    bool running = true;
+    SDL_Event event;
+    while (running) {
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) running = false;
+
+            // Keyboard
+            else if (event.type == SDL_KEYDOWN) {
+                SDL_Keycode key = event.key.keysym.sym;
+
+                // esc: exit
+                if (key == SDLK_ESCAPE) {
+                    running = false;
+                }
+
+                // S: reset game (only after snake dies)
+                else if (key == SDLK_s) {
+                    if (snake_is_done(&game)) {
+                        snake_reset(&game);
+                        printf("Game reset.\n");
+                    }
+                }
+
+                // A (left), W (straight), D (right)
+                else if (!snake_is_done(&game)) {
+                    Action action;
+                    switch (key) {
+                        case SDLK_a: action = ACTION_LEFT; break;
+                        case SDLK_w: action = ACTION_STRAIGHT; break;
+                        case SDLK_d: action = ACTION_RIGHT; break;
+                        default: continue;
+                    }
+                    float reward = snake_step(&game, action);
+                    // printf("Action: %d | Reward: %.2f | Score: %d\n", action, reward, game.score);
+                    if (snake_is_done(&game)) printf("GAME OVER! Press S to restart.\n");
+                }
+            }
+        }
+
+        // render
+        render_state(renderer, &game);
+        SDL_Delay(1);
+    }
+
+    // cleanup
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
     return 0;
 }
