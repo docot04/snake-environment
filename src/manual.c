@@ -12,6 +12,14 @@ int main(void) {
         printf("SDL_Init failed: %s\n", SDL_GetError());
         return 1;
     }
+
+    // initialize text
+    if (TTF_Init() != 0){
+        printf("TTF_Init failed: %s\n", TTF_GetError());
+        SDL_Quit();
+        return 1;
+    }
+
     SDL_Window *window = SDL_CreateWindow(
         "Snake Game",
         SDL_WINDOWPOS_CENTERED,
@@ -31,6 +39,17 @@ int main(void) {
         SDL_DestroyWindow(window);
         SDL_Quit();
         return 1;
+    }
+
+    // load font
+    TTF_Font *font = TTF_OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",24);
+    if (font == NULL){
+    printf("Font loading failed: %s\n", TTF_GetError());
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    TTF_Quit();
+    SDL_Quit();
+    return 1;
     }
 
     // game loop
@@ -74,13 +93,15 @@ int main(void) {
         }
 
         // render
-        render_state(renderer, &game);
+        render_state(renderer, &game, font);
         SDL_Delay(1);
     }
 
     // cleanup
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
+    TTF_CloseFont(font);
+    TTF_Quit();
     SDL_Quit();
     return 0;
 }

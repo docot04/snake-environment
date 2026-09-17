@@ -243,7 +243,7 @@ void snake_get_state(const Snake *game, int state[STATE_SIZE]) {
     state[10] = game->direction == DIRECTION_RIGHT;
 }
 
-void render_state(SDL_Renderer *renderer, const Snake *game) {
+void render_state(SDL_Renderer *renderer, const Snake *game, TTF_Font *font){
     if (renderer == NULL || game == NULL) return;
 
     // background
@@ -270,6 +270,21 @@ void render_state(SDL_Renderer *renderer, const Snake *game) {
     food.h = CELL_SIZE;
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
     SDL_RenderFillRect(renderer, &food);
+
+    // scoreboard
+    char score_text[50];
+    sprintf(score_text, "Score: %d", game->score);
+    SDL_Color text_color = {255, 255, 255, 255};
+    SDL_Surface *surface = TTF_RenderText_Solid(font,score_text,text_color);
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer,surface);
+    SDL_Rect score_rect;
+    score_rect.w = surface->w;
+    score_rect.h = surface->h;
+    score_rect.x = GRID_WIDTH * CELL_SIZE - score_rect.w - 10;
+    score_rect.y = 10;
+    SDL_RenderCopy(renderer,texture,NULL,&score_rect);
+    SDL_DestroyTexture(texture);
+    SDL_FreeSurface(surface);
 
     // display frame
     SDL_RenderPresent(renderer);

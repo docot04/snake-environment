@@ -8,6 +8,7 @@
 #include <sys/select.h>
 #include <unistd.h>
 #include<SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 
 #define GRID_WIDTH 20
 #define GRID_HEIGHT 20
@@ -97,6 +98,6 @@ void snake_get_state(const Snake *game, int state[STATE_SIZE]);
  * ACTION: render the current game state
  * PARAMS: SDL_Renderer, Snake
  */
-void render_state(SDL_Renderer *renderer, const Snake *game);
+void render_state(SDL_Renderer *renderer, const Snake *game, TTF_Font *font);
 
 #endif

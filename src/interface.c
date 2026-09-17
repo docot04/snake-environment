@@ -62,6 +62,11 @@ int main() {
         send_error();
         return 1;
     }
+    if (TTF_Init() != 0){
+    printf("TTF_Init failed: %s\n", TTF_GetError());
+    SDL_Quit();
+    return 1;
+    }
     SDL_Window *window = SDL_CreateWindow(
         "Snake RL Environment",
         SDL_WINDOWPOS_CENTERED,
@@ -85,14 +90,24 @@ int main() {
         return 1;
     }
 
+    TTF_Font *font = TTF_OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",24);
+    if (font == NULL){
+        printf("Font loading failed: %s\n", TTF_GetError());
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        TTF_Quit();
+        SDL_Quit();
+        return 1;
+    }
+
     // initial render
-    render_state(renderer, &game);
+    render_state(renderer, &game, font);;
     send_observation(&game, 0.0f);
 
     // main loop
     bool running = true;
     while (running) {
-        render_state(renderer, &game); // keep rendering current state
+        render_state(renderer, &game, font); // keep rendering current state
         int action;
         int result = get_action(window, &action); // get action from python
         if (result == 0) { // sdl window closed / ESC pressed
@@ -107,7 +122,7 @@ int main() {
         if (action == ACTION_QUIT) break; // quit
         if (action == ACTION_RESET) { // reset
             snake_reset(&game);
-            render_state(renderer, &game);
+            render_state(renderer, &game, font);
             send_observation(&game, 0.0f);
             continue;
         }
@@ -117,7 +132,7 @@ int main() {
         }
         if (!snake_is_done(&game)) { // dont move if dead
             float reward = snake_step(&game, (Action)action);
-            render_state(renderer, &game);
+            render_state(renderer, &game, font);
             send_observation(&game, reward);
         }
         else {
